@@ -1,4 +1,10 @@
 exportPattern("^[[:alpha:]]+")
 importFrom(Rcpp, evalCpp)
 useDynLib(RcppEigenSS)
+importClassesFrom("Matrix"
+                  , dgCMatrix
+                  , dgeMatrix
+                  , dsCMatrix
+                  , dtCMatrix
+                  )
 export(rcpp_hello)

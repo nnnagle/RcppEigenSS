@@ -2,7 +2,7 @@
 
 using namespace Rcpp;
 using namespace Eigen;
-using Eigen::MatrixXd;
+//using Eigen::MatrixXd;
 
 // [[Rcpp::export]]
 List rcpp_hello() {
@@ -12,9 +12,13 @@ List rcpp_hello() {
   m(0,1) = -1;
   m(1,1) = m(1,0) + m(0,1);
   Rcpp::Rcout << m << std::endl << std::endl;
+  SparseMatrix<double> Spm = m.sparseView();
+  Rcpp::Rcout << Spm << std::endl << std::endl;
 
   CharacterVector x = CharacterVector::create("foo", "bar");
   NumericVector y   = NumericVector::create(0.0, 1.0);
-  List z            = List::create(x, y);
+  List z            = List::create(x, y,
+                                   Rcpp::RcppEigenSS::eigen_wrap_plain_dense(m),
+                                   Rcpp::RcppEigenSS::eigen_wrap_plain_sparse(Spm));
   return z;
 }
