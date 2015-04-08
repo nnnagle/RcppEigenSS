@@ -5,8 +5,8 @@ using namespace Eigen;
 //using Eigen::MatrixXd;
 
 // [[Rcpp::export]]
-List rcpp_hello(SEXP mat) {
-  MatrixXd MAT = as<MatrixXd>(mat);
+List rcpp_hello(SEXP spmat) {
+  SparseMatrix<double> MAT = as<SparseMatrix<double> >(spmat);
   MatrixXd m(2,2);
   m(0,0) = 3;
   m(1,0) = 2.5;
@@ -19,7 +19,7 @@ List rcpp_hello(SEXP mat) {
   CharacterVector x = CharacterVector::create("foo", "bar");
   NumericVector y   = NumericVector::create(0.0, 1.0);
   List z            = List::create(x, y,
-                                   Rcpp::RcppEigenSS::eigen_wrap_plain_dense(MAT),
+                                   Rcpp::RcppEigenSS::eigen_wrap_plain_sparse(MAT),
                                    Rcpp::RcppEigenSS::eigen_wrap_plain_sparse(Spm));
   return z;
 }

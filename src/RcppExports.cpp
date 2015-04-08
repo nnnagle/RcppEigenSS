@@ -7,14 +7,14 @@
 using namespace Rcpp;
 
 // rcpp_hello
-List rcpp_hello(SEXP mat);
-RcppExport SEXP RcppEigenSS_rcpp_hello(SEXP matSEXP) {
+List rcpp_hello(SEXP spmat);
+RcppExport SEXP RcppEigenSS_rcpp_hello(SEXP spmatSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< SEXP >::type mat(matSEXP );
-        List __result = rcpp_hello(mat);
+        Rcpp::traits::input_parameter< SEXP >::type spmat(spmatSEXP );
+        List __result = rcpp_hello(spmat);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);

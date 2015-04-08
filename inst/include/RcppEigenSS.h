@@ -133,6 +133,56 @@ namespace Rcpp{
       Exporter(SEXP x) :
       MatrixExporterForEigen< Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, T >(x){}
     };
+
+    template<typename T>
+    class Exporter<Eigen::SparseMatrix<T> > {
+    public:
+      const static int RTYPE = ::Rcpp::traits::r_sexptype_traits<T>::rtype ;
+      Exporter(SEXP x) : d_x(x), d_dims(d_x.slot("Dim")), d_i(d_x.slot("i")), d_p(d_x.slot("p")), xx(d_x.slot("x")) {
+        if (!d_x.is("dgCMatrix"))
+          throw std::invalid_argument("Need S4 class dgCMatrix for a sparse matrix");
+      }
+      Eigen::SparseMatrix<T> get() {
+        Eigen::SparseMatrix<T>  ans(d_dims[0], d_dims[1]);
+        ans.reserve(d_p[d_dims[1]]);
+        for(int j = 0; j < d_dims[1]; ++j) {
+          ans.startVec(j);
+          for (int k = d_p[j]; k < d_p[j + 1]; ++k) ans.insertBack(d_i[k], j) = xx[k];
+        }
+        ans.finalize();
+        return ans;
+      }
+    protected:
+      S4            d_x;
+      IntegerVector d_dims, d_i, d_p;
+      Vector<RTYPE> xx ;
+    };
+
+    template<typename T>
+    class Exporter<Eigen::SparseMatrix<T, Eigen::RowMajor> > {
+    public:
+      const static int RTYPE = ::Rcpp::traits::r_sexptype_traits<T>::rtype ;
+
+      Exporter(SEXP x) : d_x(x), d_dims(d_x.slot("Dim")), d_j(d_x.slot("j")), d_p(d_x.slot("p")), xx(d_x.slot("x")) {
+        if (!d_x.is("dgRMatrix"))
+          throw std::invalid_argument("Need S4 class dgRMatrix for a sparse matrix");
+      }
+      Eigen::SparseMatrix<T, Eigen::RowMajor> get() {
+        Eigen::SparseMatrix<T, Eigen::RowMajor>  ans(d_dims[0], d_dims[1]);
+        ans.reserve(d_p[d_dims[0]]);
+        for(int i = 0; i < d_dims[0]; ++i) {
+          ans.startVec(i);
+          for (int k = d_p[i]; k < d_p[i + 1]; ++k) ans.insertBack(i, d_j[k]) = xx[k];
+        }
+        ans.finalize();
+        return ans;
+      }
+    protected:
+      S4            d_x;
+      IntegerVector d_dims, d_j, d_p;
+      Vector<RTYPE> xx ;
+    };
+
   } // namespace traits
 } // namespace Rcpp
 #include <Rcpp.h>
