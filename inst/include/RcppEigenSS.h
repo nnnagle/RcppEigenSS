@@ -88,6 +88,51 @@ namespace Rcpp{
 
   namespace traits {
     /* support for as */
+    template <typename T, typename value_type>
+    class MatrixExporterForEigen {
+    public:
+      typedef value_type r_export_type;
+
+      MatrixExporterForEigen(SEXP x) : object(x){}
+      ~MatrixExporterForEigen(){}
+
+      T get() {
+        Shield<SEXP> dims( ::Rf_getAttrib( object, R_DimSymbol ) );
+        if( Rf_isNull(dims) || ::Rf_length(dims) != 2 ){
+          throw ::Rcpp::not_a_matrix();
+        }
+        int* dims_ = INTEGER(dims);
+        T result( dims_[0], dims_[1] );
+        value_type *data = result.data();
+        ::Rcpp::internal::export_indexing<value_type*, value_type>( object, data );
+        return result ;
+      }
+
+    private:
+      SEXP object;
+    };
+
+    template <typename T>
+    class Exporter<Eigen::Matrix<T, Eigen::Dynamic, 1> >
+      : public IndexingExporter<Eigen::Matrix<T, Eigen::Dynamic, 1>, T> {
+    public:
+      Exporter(SEXP x) : IndexingExporter<Eigen::Matrix<T, Eigen::Dynamic, 1>, T >(x){}
+    };
+
+    template <typename T>
+    class Exporter< Eigen::Matrix<T, 1, Eigen::Dynamic> >
+      : public IndexingExporter< Eigen::Matrix<T, 1, Eigen::Dynamic>, T > {
+    public:
+      Exporter(SEXP x) : IndexingExporter< Eigen::Matrix<T, 1, Eigen::Dynamic>, T >(x){}
+    };
+
+    template <typename T>
+    class Exporter< Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >
+      : public MatrixExporterForEigen< Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, T > {
+    public:
+      Exporter(SEXP x) :
+      MatrixExporterForEigen< Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>, T >(x){}
+    };
   } // namespace traits
 } // namespace Rcpp
 #include <Rcpp.h>
