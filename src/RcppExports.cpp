@@ -6,6 +6,21 @@
 
 using namespace Rcpp;
 
+// QRtest
+List QRtest(SEXP spmat);
+RcppExport SEXP RcppEigenSS_QRtest(SEXP spmatSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< SEXP >::type spmat(spmatSEXP );
+        List __result = QRtest(spmat);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
 // rcpp_hello
 List rcpp_hello(SEXP spmat);
 RcppExport SEXP RcppEigenSS_rcpp_hello(SEXP spmatSEXP) {
